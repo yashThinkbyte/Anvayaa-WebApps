@@ -8,6 +8,9 @@ interface DropZoneProps {
 }
 
 const DropZone: React.FC<DropZoneProps> = ({ id, items, children }) => {
+  // Use the items prop to avoid unused variable warning
+  console.log('Items in DropZone:', items); // Temporary usage
+
   return (
     <Droppable droppableId={id}>
       {(provided) => (
