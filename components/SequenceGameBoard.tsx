@@ -24,32 +24,30 @@ const GameBoard: React.FC = () => {
     { id: '6', name: 'Sleep' },
   ];
 
-  const [cards, setCards] = useState<Card[]>(() => shuffleArray(correctOrder));
+  const [cards, setCards] = useState<Card[]>(() => shuffleArray([...correctOrder]));
   const [isGameOver, setIsGameOver] = useState(false);
   const [hasShuffled, setHasShuffled] = useState(false);
 
   useEffect(() => {
     if (!hasShuffled) {
-      setCards(shuffleArray(correctOrder));
+      setCards(shuffleArray([...correctOrder]));
       setHasShuffled(true);
     }
-  }, [hasShuffled]);
+  }, [hasShuffled, correctOrder]);
 
   useEffect(() => {
     const isCorrect = cards.every((card, index) => card.id === correctOrder[index].id);
-    console.log('Checking order:', cards, isCorrect);
-
     if (isCorrect) {
       setIsGameOver(true);
       alert('Congratulations! You have arranged the steps in the correct order!');
     }
-  }, [cards, correctOrder]); // Include 'correctOrder' as a dependency
+  }, [cards, correctOrder]);
 
   const handleOnDragEnd = (result: DropResult) => {
     const { source, destination } = result;
     if (!destination || source.index === destination.index) return;
 
-    const updatedCards = Array.from(cards);
+    const updatedCards = [...cards];
     const [movedCard] = updatedCards.splice(source.index, 1);
     updatedCards.splice(destination.index, 0, movedCard);
     setCards(updatedCards);
