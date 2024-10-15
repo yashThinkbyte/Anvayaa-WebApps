@@ -5,14 +5,19 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import DraggableCard from './DraggableCard';
 import DropZone from './DropZone';
 
+// Define the type for a card
+interface Card {
+    id: string;
+    name: string;
+}
 
 // Helper function to shuffle an array
-const shuffleArray = (array: any[]) => {
+const shuffleArray = (array: Card[]): Card[] => {
     return array.sort(() => Math.random() - 0.5);
-};  
+};
 
 const GameBoard: React.FC = () => {
-    const correctOrder = [
+    const correctOrder: Card[] = [
         { id: '1', name: 'Brush your Teeth' },
         { id: '2', name: 'Take a bath' },
         { id: '3', name: 'Eat your breakfast' },
@@ -20,29 +25,28 @@ const GameBoard: React.FC = () => {
         { id: '5', name: 'Eat dinner' },
         { id: '6', name: 'Sleep' },
     ];
-    const [cards, setCards] = useState(() => shuffleArray([...correctOrder]));
-    const [isGameOver, setIsGameOver] = useState(false);
-    const [hasShuffled, setHasShuffled] = useState(false); 
 
+    const [cards, setCards] = useState<Card[]>(() => shuffleArray([...correctOrder]));
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [hasShuffled, setHasShuffled] = useState(false);
 
     useEffect(() => {
         if (!hasShuffled) {
-        setCards(shuffleArray([...correctOrder]));
-        setHasShuffled(true); // Ensure shuffling only happens once
+            setCards(shuffleArray([...correctOrder]));
+            setHasShuffled(true); // Ensure shuffling only happens once
         }
     }, [hasShuffled]);
 
     useEffect(() => {
         const isCorrect = cards.every((card, index) => card.id === correctOrder[index].id);
         console.log('Checking order:', cards, isCorrect);
-    
+
         if (isCorrect) {
-          setIsGameOver(true);
-          alert('Congratulations! You have arranged the steps in the correct order!');
+            setIsGameOver(true);
+            alert('Congratulations! You have arranged the steps in the correct order!');
         }
     }, [cards]); // Re-run when cards state changes
 
-    // Handle drag-and-drop reordering
     const handleOnDragEnd = (result: DropResult) => {
         const { source, destination } = result;
 
@@ -54,17 +58,15 @@ const GameBoard: React.FC = () => {
         setCards(updatedCards);
     };
 
-    // Move a card up by one position
     const moveUp = (index: number) => {
-        if (index <= 0 || isGameOver) return; // Already at the top or game is over
+        if (index <= 0 || isGameOver) return;
         const updatedCards = Array.from(cards);
         [updatedCards[index - 1], updatedCards[index]] = [updatedCards[index], updatedCards[index - 1]];
         setCards(updatedCards);
     };
 
-    // Move a card down by one position
     const moveDown = (index: number) => {
-        if (index >= cards.length - 1 || isGameOver) return; // Already at the bottom or game is over
+        if (index >= cards.length - 1 || isGameOver) return;
         const updatedCards = Array.from(cards);
         [updatedCards[index], updatedCards[index + 1]] = [updatedCards[index + 1], updatedCards[index]];
         setCards(updatedCards);
@@ -74,25 +76,25 @@ const GameBoard: React.FC = () => {
         return <h1 className="text-center mt-10 text-green-500">🎉 Congratulations! Game Over! 🎉</h1>;
     }
 
-  return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
-      <div className="flex h-screen justify-center items-center">
-        <DropZone id="vertical-droppable" items={cards}>
-          {cards.map((card, index) => (
-            <DraggableCard 
-              key={card.id} 
-              id={card.id} 
-              name={card.name} 
-              index={index} 
-              onMoveUp={() => moveUp(index)} 
-              onMoveDown={() => moveDown(index)} 
-              showButtons={true}
-            />
-          ))}
-        </DropZone>
-      </div>
-    </DragDropContext>
-  );
+    return (
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+            <div className="flex h-screen justify-center items-center">
+                <DropZone id="vertical-droppable" items={cards}>
+                    {cards.map((card, index) => (
+                        <DraggableCard
+                            key={card.id}
+                            id={card.id}
+                            name={card.name}
+                            index={index}
+                            onMoveUp={() => moveUp(index)}
+                            onMoveDown={() => moveDown(index)}
+                            showButtons={true}
+                        />
+                    ))}
+                </DropZone>
+            </div>
+        </DragDropContext>
+    );
 };
 
 export default GameBoard;
